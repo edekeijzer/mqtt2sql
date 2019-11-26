@@ -148,7 +148,10 @@ def write2sql(message):
     debuglog(1,"SQL type is '{}'".format(args.sqltype))
     try:
         if args.sqltype=='mysql':
-            db = MySQLdb.connect(args.sqlhost, args.sqlusername, args.sqlpassword, args.sqldb)
+            if args.sqlsocket:
+                db = MySQLdb.connect(unix_socket = args.sqlsocket, user = args.sqlusername, passwd = args.sqlpassword, db = args.sqldb)
+            else:
+                db = MySQLdb.connect(args.sqlhost, args.sqlusername, args.sqlpassword, args.sqldb, args.sqlport)
         elif args.sqltype=='sqlite':
             db = sqlite3.connect(args.sqldb)
     except IndexError:
@@ -366,6 +369,7 @@ if __name__ == "__main__":
     sql_group.add_argument('--sqltype',                     metavar='<type>',           dest='sqltype',     choices=sqltypes,default=DEFAULTS['SQL']['type'],           help="server type {} (default '{}')".format(sqltypes, DEFAULTS['SQL']['type']))
     sql_group.add_argument('--sqlhost',                     metavar='<host>',           dest='sqlhost',                     default=DEFAULTS['SQL']['host'],            help="host to connect (default '{}')".format(DEFAULTS['SQL']['host']))
     sql_group.add_argument('--sqlport',                     metavar='<port>',           dest='sqlport',     type=int,       default=DEFAULTS['SQL']['port'],            help="port to connect (default {})".format(DEFAULTS['SQL']['port']))
+    sql_group.add_argument('--sqlsocket',                   metavar='<socket>',         dest='sqlsocket',                                                               help="Unix socket to connect")
     sql_group.add_argument('--sqlusername',                 metavar='<username>',       dest='sqlusername',                 default=DEFAULTS['SQL']['username'],        help="username (default {})".format(DEFAULTS['SQL']['username']))
     sql_group.add_argument('--sqlpassword',                 metavar='<password>',       dest='sqlpassword',                 default=DEFAULTS['SQL']['password'],        help="password (default {})".format(DEFAULTS['SQL']['password']))
     sql_group.add_argument('--sqldb',                       metavar='<db>',             dest='sqldb',                       default=DEFAULTS['SQL']['db'],              help="database to use (default '{}')".format(DEFAULTS['SQL']['db']))
